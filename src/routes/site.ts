@@ -3,6 +3,8 @@ import * as login from '../controller/login'
 import * as gallery from '../controller/gallery'
 import * as picture from '../controller/pictures'
 import * as auth from '../middlewares/auth'
+import * as upload from '../middlewares/uploadFile'
+
 
 const router = Router();
 
@@ -23,7 +25,7 @@ router.delete('/galleries/:id_user/profile/:id', auth.Private, gallery.deleteGal
 
 router.get('/galleries/:id_user/profile/:id_gallery/pictures', auth.Private, picture.getPictures)
 
-router.post('/galleries/:id_user/profile/:id_gallery/pictures', auth.Private, picture.addPictures)
+router.post('/galleries/:id_user/profile/:id_gallery/pictures', auth.Private, upload.image.single('file'), picture.addPictures)
 
 router.put('/galleries/:id_user/profile/:id_gallery/pictures/:id', auth.Private, picture.updatePicture)
 

@@ -18,22 +18,30 @@ export const addPictures: RequestHandler = async (req, res) => {
     const {id_user, id_gallery} = req.params;
 
     const addPicturesSchema = z.object({
-        title: z.string(),
-        description: z.string(),
-        image: z.string()
+            title: z.string(),
+            description: z.string(),
+            image: z.string()
+        
     })
 
-    const body = addPicturesSchema.safeParse(req.body);
-    if(!body.success) return res.json({error: 'Dados invalidos'});
+    if(!req.file) return res.json({error: 'arquivo porra'})
 
+    const pictureData = addPicturesSchema.parse({
+        image: req.file?.originalname,
+        title: req.body.title,
+        description: req.body.description
+    });
+
+    if(!pictureData) return res.json({ error: 'Dados invalidos'})
+    
     const newPicture = await pictures.create({
-        image_title: body.data.title,
-        image_description: body.data.description,
-        image: body.data.image,
+        image_title: pictureData.title,
+        image_description: pictureData.description,
+        image: pictureData.image,
         id_user: id_user,
         id_gallery: parseInt(id_gallery)
     });
-    if(newPicture) return res.status(201).json({ picture: newPicture});
+    if(newPicture) return res.status(201).json({ picture: newPicture, avatar: req.file});
 
 
 }

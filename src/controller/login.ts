@@ -5,7 +5,7 @@ import * as auth from '../middlewares/auth'
 
 export const singIn: RequestHandler = async (req, res) => {
     const loginSchema = z.object({
-        email: z.string(),
+        email: z.string().email(),
         password: z.string(),
     });
 
@@ -34,15 +34,28 @@ export const singUp: RequestHandler = async (req, res) => {
     const body = registerSchema.safeParse(req.body)
 
     if(!body.success) return res.json({ error: 'Dados invalidos'})
-    
-    const newRegister = await user.register(body.data)
-    
-    if(newRegister) {
-        const token = await auth.createToken(newRegister.email, newRegister.id)
-        res.status(200).json({ user: newRegister, token: token})
-    }
 
-   // res.json({error: 'algo deu errado'})
+    
+    const hashUser = await user.getLogin(body.data)
+    
+    if(!hashUser) {
+
+        const newRegister = await user.register(body.data)
+        if(newRegister) {
+            const token = await auth.createToken(newRegister.email, newRegister.id)
+            res.status(200).json({ user: newRegister, token: token})
+
+        } else {
+            res.status(401).json({ error: 'E-mail já existe'})
+        }
+
+    } else {
+        res.status(401).json({ error: 'Algo deu errado'})
+    }
+    
+    
+
+   
 
 }
 

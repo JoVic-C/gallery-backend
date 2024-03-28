@@ -5,6 +5,8 @@ import { createToken } from "../middlewares/auth";
 type LoginFilters = {email: string, password: string}
 export const login = async (filter: LoginFilters) => {
     try{
+        
+
         return await prisma.user.findFirst({ where: filter });
     } catch(err) {
         return false;
@@ -17,4 +19,9 @@ export const register = async(data: RegisterCreateData) => {
     } catch(err) {
         return false;
     }
+}
+
+type GetOneFilters = {email: string}
+export const getLogin = async(filter: GetOneFilters) => {
+    return await prisma.user.findFirst({ where: filter})
 }
