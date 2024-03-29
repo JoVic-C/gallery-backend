@@ -24,10 +24,9 @@ export const addPictures: RequestHandler = async (req, res) => {
         
     })
 
-    if(!req.file) return res.json({error: 'arquivo porra'})
 
     const pictureData = addPicturesSchema.parse({
-        image: req.file?.originalname,
+        image: req.file?.filename,
         title: req.body.title,
         description: req.body.description
     });
@@ -41,7 +40,7 @@ export const addPictures: RequestHandler = async (req, res) => {
         id_user: id_user,
         id_gallery: parseInt(id_gallery)
     });
-    if(newPicture) return res.status(201).json({ picture: newPicture, avatar: req.file});
+    if(newPicture) return res.status(201).json({ picture: newPicture, file: req.file});
 
 
 }
@@ -49,22 +48,34 @@ export const addPictures: RequestHandler = async (req, res) => {
 export const updatePicture: RequestHandler = async(req, res) => {
     const {id, id_gallery, id_user} = req.params;
 
+ 
     const updatePictureSchema = z.object({
         title: z.string().optional(),
         description: z.string().optional(),
         image: z.string().optional()
     });
 
-    const body = updatePictureSchema.safeParse(req.body);
-    if(!body.success) return res.json({ error: 'Dados invalidos'});
+    const validatedUpdateData = updatePictureSchema.parse({
+        image: req.file?.filename,
+        title: req.body.title,
+        description: req.body.description
+    });
+
+    if(!validatedUpdateData) return res.json({ error: 'Dados invalidos'});
+
+    const updatePictureData = {
+        image_title: validatedUpdateData.title,
+        image_description: validatedUpdateData.description,
+        image: validatedUpdateData.image,
+    }
 
     const updatedPicture = await pictures.update({
         id: parseInt(id),
         id_user: id_user,
         id_gallery: parseInt(id_gallery)
-    }, body.data);
+    }, updatePictureData);
     
-    return res.json({ picture: updatedPicture})
+    return res.json({ picture: updatePictureData, file: req.file})
 }
 
 

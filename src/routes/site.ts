@@ -27,7 +27,7 @@ router.get('/galleries/:id_user/profile/:id_gallery/pictures', auth.Private, pic
 
 router.post('/galleries/:id_user/profile/:id_gallery/pictures', auth.Private, upload.image.single('file'), picture.addPictures)
 
-router.put('/galleries/:id_user/profile/:id_gallery/pictures/:id', auth.Private, picture.updatePicture)
+router.put('/galleries/:id_user/profile/:id_gallery/pictures/:id', auth.Private,upload.image.single('file'), picture.updatePicture)
 
 router.delete('/galleries/:id_user/profile/:id_gallery/pictures/:id', auth.Private, picture.deletePicture)
 
